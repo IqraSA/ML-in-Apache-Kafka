@@ -43,7 +43,7 @@ def best_threshold(y_true, pred_proba, proba_range, verbose=False):
 		score = f1_score(y_true,pred)
 		scores.append(score)
 		if verbose:
-			print("INFO: prob threshold: {}.  score :{}".format(round(prob,3), round(score,5)))
+			print(f"INFO: prob threshold: {round(prob, 3)}.  score :{round(score, 5)}")
 	best_score = scores[np.argmax(scores)]
 	optimal_threshold = proba_range[np.argmax(scores)]
 	return (optimal_threshold, best_score)
@@ -109,13 +109,13 @@ class LGBOptimizer(object):
 		# The next few lines are the only ones related to mlflow.
 		if not Path('mlruns').exists():
             # here set the tracking_uri. If None then http://localhost:5000
-		    client = MlflowClient()
-		    n_experiments=0
+			client = MlflowClient()
+			n_experiments=0
 		elif not reuse_experiment:
-		    client = MlflowClient()
-		    n_experiments = len(client.list_experiments())
-		    experiment_name = 'experiment_' + str(n_experiments)
-		    client.create_experiment(name=experiment_name)
+			client = MlflowClient()
+			n_experiments = len(client.list_experiments())
+			experiment_name = f'experiment_{n_experiments}'
+			client.create_experiment(name=experiment_name)
 		with mlflow.start_run(experiment_id=n_experiments):
 			model = lgb.LGBMClassifier(**best)
 			model.fit(self.lgtrain.data,
@@ -127,8 +127,8 @@ class LGBOptimizer(object):
 			mlflow.log_metric('binary_logloss', trials.best_trial['result']['loss'])
 			mlflow.sklearn.log_model(model, "model")
 
-		model_fname = 'model_{}_.p'.format(model_id)
-		best_experiment_fname = 'best_experiment_{}_.p'.format(model_id)
+		model_fname = f'model_{model_id}_.p'
+		best_experiment_fname = f'best_experiment_{model_id}_.p'
 
 		pickle.dump(model, open(self.PATH/model_fname, 'wb'))
 		pickle.dump(best, open(self.PATH/best_experiment_fname, 'wb'))
@@ -180,7 +180,4 @@ class LGBOptimizer(object):
 		    'reg_lambda': hp.uniform('reg_lambda', 0.01, 0.1),
 		}
 
-		if param_space:
-			return param_space
-		else:
-			return space
+		return param_space or space

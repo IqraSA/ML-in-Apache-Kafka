@@ -14,8 +14,7 @@ warnings.filterwarnings("ignore")
 def load_new_training_data(path):
 	data = []
 	with open(path, "r") as f:
-		for line in f:
-			data.append(json.loads(line))
+		data.extend(json.loads(line) for line in f)
 	return pd.DataFrame(data)
 
 
@@ -49,7 +48,7 @@ def build_train(train_path, results_path, dataprocessor_id=0, PATH_2=None):
 		sc=MinMaxScaler()
 		)
 
-	dataprocessor_fname = 'dataprocessor_{}_.p'.format(dataprocessor_id)
+	dataprocessor_fname = f'dataprocessor_{dataprocessor_id}_.p'
 	pickle.dump(dataprocessor, open(results_path/dataprocessor_fname, "wb"))
 	if dataprocessor_id==0:
 		pickle.dump(df.columns.tolist()[:-1], open(results_path/'column_order.p', "wb"))

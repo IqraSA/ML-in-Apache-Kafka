@@ -40,7 +40,7 @@ def best_threshold(y_true, pred_proba, proba_range, verbose=False):
 		score = f1_score(y_true,pred)
 		scores.append(score)
 		if verbose:
-			print("INFO: prob threshold: {}.  score :{}".format(round(prob,3), round(score,5)))
+			print(f"INFO: prob threshold: {round(prob, 3)}.  score :{round(score, 5)}")
 	best_score = scores[np.argmax(scores)]
 	optimal_threshold = proba_range[np.argmax(scores)]
 	return (optimal_threshold, best_score)
@@ -110,8 +110,8 @@ class LGBOptimizer(object):
 			feature_name=self.colnames,
 			categorical_feature=self.categorical_columns)
 
-		model_fname = 'model_{}_.p'.format(model_id)
-		best_experiment_fname = 'best_experiment_{}_.p'.format(model_id)
+		model_fname = f'model_{model_id}_.p'
+		best_experiment_fname = f'best_experiment_{model_id}_.p'
 
 		pickle.dump(model, open(self.PATH/model_fname, 'wb'))
 		pickle.dump(best, open(self.PATH/best_experiment_fname, 'wb'))
@@ -164,7 +164,4 @@ class LGBOptimizer(object):
 		    'reg_lambda': hp.uniform('reg_lambda', 0.01, 0.1),
 		}
 
-		if param_space:
-			return param_space
-		else:
-			return space
+		return param_space or space
