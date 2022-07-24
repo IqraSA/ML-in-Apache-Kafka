@@ -21,7 +21,7 @@ MESSAGES_PATH = PATH/'messages'
 
 
 def train(model_id, messages, hyper):
-	print("RETRAINING STARTED (model id: {})".format(model_id))
+	print(f"RETRAINING STARTED (model id: {model_id})")
 	dtrain = build_train(TRAIN_DATA, DATAPROCESSORS_PATH, model_id, messages)
 	if hyper == "hyperopt":
 		# from train.train_hyperopt import LGBOptimizer
@@ -31,7 +31,7 @@ def train(model_id, messages, hyper):
 		from train.train_hyperparameterhunter_mlfow import LGBOptimizer
 	LGBOpt = LGBOptimizer(dtrain, MODELS_PATH)
 	LGBOpt.optimize(maxevals=2, model_id=model_id)
-	print("RETRAINING COMPLETED (model id: {})".format(model_id))
+	print(f"RETRAINING COMPLETED (model id: {model_id})")
 
 
 def start(hyper):
@@ -42,7 +42,7 @@ def start(hyper):
 		if 'retrain' in message and message['retrain']:
 			model_id = message['model_id']
 			batch_id = message['batch_id']
-			message_fname = 'messages_{}_.txt'.format(batch_id)
+			message_fname = f'messages_{batch_id}_.txt'
 			messages = MESSAGES_PATH/message_fname
 
 			train(model_id, messages, hyper)

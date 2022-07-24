@@ -28,7 +28,7 @@ def start_producing():
 		producer.send('app_messages', json.dumps(message).encode('utf-8'))
 		producer.flush()
 
-		print("\033[1;31;40m -- PRODUCER: Sent message with id {}".format(message_id))
+		print(f"\033[1;31;40m -- PRODUCER: Sent message with id {message_id}")
 		sleep(2)
 
 
@@ -39,13 +39,13 @@ def start_consuming():
 		message = json.loads(msg.value)
 		if 'prediction' in message:
 			request_id = message['request_id']
-			print("\033[1;32;40m ** CONSUMER: Received prediction {} for request id {}".format(message['prediction'], request_id))
+			print(
+				f"\033[1;32;40m ** CONSUMER: Received prediction {message['prediction']} for request id {request_id}"
+			)
 
 
-threads = []
 t = threading.Thread(target=start_producing)
 t2 = threading.Thread(target=start_consuming)
-threads.append(t)
-threads.append(t2)
+threads = [t, t2]
 t.start()
 t2.start()

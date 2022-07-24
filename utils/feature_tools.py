@@ -26,10 +26,7 @@ class FeatureTools(object):
 		sc: trained scaler
 		"""
 		df = df_inp.copy()
-		if not trained:
-			df[cols] = sc.fit_transform(df[cols])
-		else:
-			df[cols] = sc.transform(df[cols])
+		df[cols] = sc.transform(df[cols]) if trained else sc.fit_transform(df[cols])
 		return df, sc
 
 	@staticmethod
@@ -54,7 +51,7 @@ class FeatureTools(object):
 		"""
 		df = df_inp.copy()
 		colnames = ['_'.join(x_c) for x_c in x_cols]
-		crossed_columns = {k:v for k,v in zip(colnames, x_cols)}
+		crossed_columns = dict(zip(colnames, x_cols))
 
 		for k, v in crossed_columns.items():
 		    df[k] = df[v].apply(lambda x: '-'.join(x), axis=1)
@@ -85,14 +82,8 @@ class FeatureTools(object):
 		df = df_inp.copy()
 		if not val_to_idx:
 
-			val_types = dict()
-			for c in cols:
-			    val_types[c] = df[c].unique()
-
-			val_to_idx = dict()
-			for k, v in val_types.items():
-			    val_to_idx[k] = {o: i for i, o in enumerate(val_types[k])}
-
+			val_types = {c: df[c].unique() for c in cols}
+			val_to_idx = {k: {o: i for i, o in enumerate(val_types[k])} for k in val_types}
 		for k, v in val_to_idx.items():
 		    df[k] = df[k].apply(lambda x: v[x])
 
@@ -142,11 +133,7 @@ class FeatureTools(object):
 			Tranformed dataframe: scaled, Labelencoded and with crossed columns
 		"""
 		df = df_inp.copy()
-		if trained_sc:
-			sc = copy.deepcopy(trained_sc)
-		else:
-			sc = copy.deepcopy(self.sc)
-
+		sc = copy.deepcopy(trained_sc) if trained_sc else copy.deepcopy(self.sc)
 		df, _ = self.num_scaler(df, self.numerical_columns, sc, trained=True)
 		df, _ = self.cross_columns(df, self.x_columns)
 		df, _ = self.val2idx(df, self.categorical_columns+self.crossed_columns, self.encoding_d)

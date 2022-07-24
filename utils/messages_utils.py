@@ -25,10 +25,9 @@ def read_messages_count(path, repeat_every):
 
 
 def append_message(message, path, batch_id):
-	message_fname = 'messages_{}_.txt'.format(batch_id)
-	f=open(path/message_fname, "a")
-	f.write("%s\n" % (json.dumps(message)))
-	f.close()
+	message_fname = f'messages_{batch_id}_.txt'
+	with open(path/message_fname, "a") as f:
+		f.write("%s\n" % (json.dumps(message)))
 
 
 def send_retrain_message(model_id, batch_id):

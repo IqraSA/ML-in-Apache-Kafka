@@ -87,7 +87,7 @@ class LGBOptimizer(object):
         elif not reuse_experiment:
             client = MlflowClient()
             n_experiments = len(client.list_experiments())
-            experiment_name = 'experiment_' + str(n_experiments)
+            experiment_name = f'experiment_{n_experiments}'
             client.create_experiment(name=experiment_name)
         with mlflow.start_run(experiment_id=n_experiments):
             model = lgb.LGBMClassifier(**best)
@@ -101,8 +101,8 @@ class LGBOptimizer(object):
             mlflow.log_metric('f1_score', -optimizer.optimizer_result.fun)
             mlflow.sklearn.log_model(model, "model")
 
-        model_fname = 'model_{}_.p'.format(model_id)
-        best_experiment_fname = 'best_experiment_{}_.p'.format(model_id)
+        model_fname = f'model_{model_id}_.p'
+        best_experiment_fname = f'best_experiment_{model_id}_.p'
         pickle.dump(model, open('/'.join([self.PATH,model_fname]), 'wb'))
         pickle.dump(optimizer, open('/'.join([self.PATH,best_experiment_fname]), 'wb'))
 
@@ -121,10 +121,7 @@ class LGBOptimizer(object):
                 reg_lambda= Real(0.01, 0.1)
             )
 
-        if param_space:
-            return param_space
-        else:
-            return space
+        return param_space or space
 
     def extra_setup(self, extra_setup=None):
 
@@ -134,7 +131,4 @@ class LGBOptimizer(object):
             categorical_feature=self.categorical_columns
         )
 
-        if extra_setup:
-            return extra_setup
-        else:
-            return extra_params
+        return extra_setup or extra_params

@@ -55,9 +55,9 @@ def start(model_id, messages_count, batch_id):
 		message = json.loads(msg.value)
 
 		if is_retraining_message(msg):
-			model_fname = 'model_{}_.p'.format(model_id)
+			model_fname = f'model_{model_id}_.p'
 			model = reload_model(MODELS_PATH/model_fname)
-			print("NEW MODEL RELOADED {}".format(model_id))
+			print(f"NEW MODEL RELOADED {model_id}")
 
 		elif is_application_message(msg):
 			request_id = message['request_id']
@@ -74,14 +74,14 @@ def start(model_id, messages_count, batch_id):
 
 if __name__ == '__main__':
 	dataprocessor_id = 0
-	dataprocessor_fname = 'dataprocessor_{}_.p'.format(dataprocessor_id)
+	dataprocessor_fname = f'dataprocessor_{dataprocessor_id}_.p'
 	dataprocessor = pickle.load(open(DATAPROCESSORS_PATH/dataprocessor_fname, 'rb'))
 
 	messages_count = read_messages_count(MESSAGES_PATH, RETRAIN_EVERY)
 	batch_id = messages_count % RETRAIN_EVERY
 
 	model_id = batch_id % (EXTRA_MODELS_TO_KEEP + 1)
-	model_fname = 'model_{}_.p'.format(model_id)
+	model_fname = f'model_{model_id}_.p'
 	model = reload_model(MODELS_PATH/model_fname)
 
 	consumer = KafkaConsumer(bootstrap_servers=KAFKA_HOST)
